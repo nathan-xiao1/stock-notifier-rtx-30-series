@@ -1,7 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from stores.Mwave import Mwave
+import os, time
 
+# Time between scrapes (seconds)
+SCRAPE_INTERVAL = 30
 DRIVER_PATH = "C:\Program Files\Google\Chrome\Application\chromedriver.exe"
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.146 Safari/537.36',
@@ -11,20 +14,22 @@ headers = {
     'Connection': 'keep-alive'
 }
 
-# Selenium
+# Options
 options = Options()
 options.headless = True
+options.add_argument('--log-level=3')
 options.add_argument("--window-size=1920x1080")
 options.add_argument("--disable-gpu")
 options.add_argument(
     "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36")
 
-driver = webdriver.Chrome(options=options, executable_path=DRIVER_PATH)
+# Create a Chrome webdriver
+driver = webdriver.Chrome(options=options, service_log_path=os.devnull, executable_path=DRIVER_PATH)
 
-mwaveAIO = "https://www.mwave.com.au/graphics-cards/geforce-rtx-3070"
+# URLs to scrape
 mwaveUrls = [
-    "https://www.mwave.com.au/product/evga-geforce-rtx-3080-ftw3-ultra-gaming-10gb-video-card-ac38322",
-    "https://www.mwave.com.au/product/startech-1m-slim-35mm-stereo-extension-audio-cable-mf-ab86567"
+    "https://www.mwave.com.au/graphics-cards/geforce-rtx-3070",
+    "https://www.mwave.com.au/product/evga-geforce-rtx-3080-ftw3-ultra-gaming-10gb-video-card-ac38322"
 ]
 
 
@@ -32,5 +37,7 @@ stores = [
     Mwave()
 ]
 
-for store in stores:
-    print(store.scrapeAIO(driver, options, mwaveAIO))
+while True:
+    for store in stores:
+        print(store.scrape(driver, options, mwaveUrls))
+    time.sleep(SCRAPE_INTERVAL)
