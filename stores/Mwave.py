@@ -1,15 +1,17 @@
 from .StoreABC import Store, Product
-import time
+import time, json, os.path
 
 SCRAPE_DELAY = 0.3
 STORE_NAME = "Mwave"
-
 
 class Mwave(Store):
 
     def __init__(self):
         # Set of items that are in stock
-        self.in_stock_items = set()
+        self.in_stock_items = self.load()
+
+    def store_name(self):
+        return STORE_NAME
 
     def scrape(self, driver, urls):
         changed = False

@@ -10,8 +10,9 @@ DRIVER_PATH = "C:\Program Files\Google\Chrome\Application\chromedriver.exe"
 class StockNotifier:
 
     def __init__(self):
+        self.running = True
         self.callbacks = []
-        self.mwave = Mwave()
+        self.stores = [Mwave()]
         with open("urls.json") as json_file:
             self.urls = json.load(json_file)
 
@@ -29,18 +30,24 @@ class StockNotifier:
         
     async def start(self):
         print("StockNotifier: Started")
-        while True:
-            changed, in_stock, out_stock = self.mwave.scrape(self.driver, self.urls["mwave"])
-            # changed, in_stock, out_stock = False, [], []
-            print(changed, in_stock, out_stock)
-            if changed:
-                for callback in self.callbacks:
-                    await callback(in_stock, out_stock)
-            await asyncio.sleep(SCRAPE_INTERVAL)
+        while self.running:
+            for store in self.stores:
+                changed, in_stock, out_stock = store.scrape(self.driver, self.urls["mwave"])
+                if changed:
+                    for callback in self.callbacks:
+                        await callback(in_stock, out_stock)
+                print("StockNotifier: Sleeping")
+                await asyncio.sleep(SCRAPE_INTERVAL)
+
+    def stop(self):
+        self.running = False
 
     def registerCallback(self, callback):
         self.callbacks.append(callback)
 
+    def save(self):
+        for store in self.stores:
+            store.save()
 
 if __name__ == "__main__":
     stock_notifier = StockNotifier()
