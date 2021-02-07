@@ -1,30 +1,77 @@
-from .StoreABC import Store
+from .StoreABC import Store, Product
 import time
 
 SCRAPE_DELAY = 0.3
+STORE_NAME = "Mwave"
+
 
 class Mwave(Store):
 
-	def scrape(self, driver, options, urls):
-		in_stock = []
-		for url in urls:
-			driver.get(url)
-			if url.startswith("https://www.mwave.com.au/product/"):
-				# URL is for a product page
-				ul = driver.find_element_by_class_name("stockAndDelivery")
-				dd = ul.find_element_by_tag_name("dd")
-				if dd.text != "Currently No Stock":
-					basic_info = driver.find_element_by_class_name("basicInfos")
-					item_name = basic_info.find_element_by_xpath("//span[@itemprop='name']").text
-					in_stock.append({item_name: url})
-				time.sleep(SCRAPE_DELAY)
-			else:
-				# URL is for a result search or product list
-				result_li = driver.find_element_by_xpath("//div[@id='ProductResults']/ul[@class='productList']")
-				items_li = result_li.find_elements_by_tag_name("li")
-				for item in items_li:
-					button = item.find_element_by_class_name("button")
-					if "normalButton" in button.get_attribute("class"):
-						link = item.find_element_by_xpath("./div[@class='name']/a")
-						in_stock.append({link.text: link.get_attribute("href")})
-		return in_stock
+    def __init__(self):
+        # Set of items that are in stock
+        self.in_stock_items = set()
+
+    def scrape(self, driver, urls):
+        changed = False
+        new_in_stock = []
+        new_out_of_stock = []
+        # Scrape each URL
+        for url in urls:
+            print(f"Processing: {url}")
+            driver.get(url)
+            if url.startswith("https://www.mwave.com.au/product/"):
+                # URL is for a product page
+                product_container = driver.find_element_by_class_name(
+                    "productCommon")
+                # Get necessary infomation
+                name = product_container.find_element_by_xpath(
+                    "./div[@class='basicInfos']/h1/span[@itemprop='name']")
+                price = product_container.find_element_by_xpath(
+                    "./div[@class='divAddCart']//div[@class='divPriceNormal']/div[1]").text
+                image = product_container.find_element_by_xpath(
+                    "./div[@class='packshotAndReviews']//div[@class='medium']/a[1]/img"
+                ).get_attribute("src")
+                stock_level = product_container.find_element_by_xpath(
+                    "./div[@class='basicInfos']/ul[@class='stockAndDelivery']//dd").text
+                # Handle in stock or out of stock
+                if stock_level != "Currently No Stock" and name not in self.in_stock_items:
+                    changed = True
+                    self.in_stock_items.add(name)
+                    new_in_stock.append(Product(name, price, STORE_NAME, url))
+                elif stock_level == "Currently No Stock" and name in self.in_stock_items:
+                    changed = True
+                    self.in_stock_items.remove(name)
+                    new_out_of_stock.append(
+                        Product(name, price, image, STORE_NAME, url))
+            else:
+                # URL is for a result search or product list
+                result_li = driver.find_element_by_xpath(
+                    "//div[@id='ProductResults']/ul[@class='productList']")
+                # Loop over each product item inside the li tag
+                for item in result_li.find_elements_by_tag_name("li"):
+                    # Get necessary infomation
+                    name = item.find_element_by_xpath(
+                        "./div[@class='name']/a").text
+                    link = item.find_element_by_xpath(
+                        "./div[@class='name']/a").get_attribute("href")
+                    price = item.find_element_by_xpath(
+                        "./div[@class='price']/div[@class='current'][1]").text
+                    image = item.find_element_by_xpath(
+                        "./div[@class='imageProd']/a/img"
+                    ).get_attribute("src")
+                    in_stock = "normalButton" in item.find_element_by_class_name(
+                        "button").get_attribute("class")
+                    # Handle in stock or out of stock
+                    if in_stock and name not in self.in_stock_items:
+                        changed = True
+                        self.in_stock_items.add(name)
+                        new_in_stock.append(
+                            Product(name, price, image, STORE_NAME, link))
+                    elif not in_stock and name in self.in_stock_items:
+                        changed = True
+                        self.in_stock_items.remove(name)
+                        new_out_of_stock.append(
+                            Product(name, price, image, STORE_NAME, link))
+                        # Delay to avoid overloading server
+            time.sleep(SCRAPE_DELAY)
+        return changed, new_in_stock, new_out_of_stock
