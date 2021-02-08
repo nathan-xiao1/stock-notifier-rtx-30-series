@@ -2,6 +2,7 @@ import discord
 import asyncio
 from stores.StoreABC import Product
 from StockNotifier import StockNotifier
+from datetime import datetime
 
 CHANNEL_IDS = [807797016742461450]
 
@@ -47,6 +48,7 @@ def createEmbedded(item, in_stock=True):
     embed.add_field(name="Price", value=item.price, inline=True)
     embed.add_field(name="Product Link",
                     value=f"[Take me there]({item.link})", inline=True)
+    embed.timestamp = datetime.utcnow()
     return embed
 
 stock_notifier.registerCallback(notify)

@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/vscode,python
-# Edit at https://www.toptal.com/developers/gitignore?templates=vscode,python
+# Created by https://www.toptal.com/developers/gitignore/api/python,vscode,venv,virtualenv
+# Edit at https://www.toptal.com/developers/gitignore?templates=python,vscode,venv,virtualenv
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
@@ -141,6 +141,22 @@ dmypy.json
 # profiling data
 .prof
 
+### venv ###
+# Virtualenv
+# http://iamzed.com/2009/05/07/a-primer-on-virtualenv/
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ib64
+[Ll]ocal
+[Ss]cripts
+pyvenv.cfg
+pip-selfcheck.json
+
+### VirtualEnv ###
+# Virtualenv
+# http://iamzed.com/2009/05/07/a-primer-on-virtualenv/
+
 ### vscode ###
 .vscode/*
 !.vscode/settings.json
@@ -149,4 +165,4 @@ dmypy.json
 !.vscode/extensions.json
 *.code-workspace
 
-# End of https://www.toptal.com/developers/gitignore/api/vscode,python
+# End of https://www.toptal.com/developers/gitignore/api/python,vscode,venv,virtualenv
