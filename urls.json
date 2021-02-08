@@ -1,5 +1,10 @@
 {
-    "mwave": [
-        "https://www.mwave.com.au/graphics-cards/geforce-rtx-3070"
+    "Mwave": [
+        "https://www.mwave.com.au/graphics-cards/geforce-rtx-3070",
+        "https://www.mwave.com.au/graphics-cards/geforce-rtx-3080"
+    ],
+    "Scorptec": [
+        "https://www.scorptec.com.au/geforcertx3070",
+        "https://www.scorptec.com.au/geforcertx3080"
     ]
 }
