@@ -1,18 +1,23 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from stores.Mwave import Mwave
-import os, json, asyncio
+from stores.Scorptec import Scorptec
+from stores.Umart import Umart
+import os
+import json
+import asyncio
 
 # Time between scrapes (seconds)
 SCRAPE_INTERVAL = 30
-DRIVER_PATH = "C:\Program Files\Google\Chrome\Application\chromedriver.exe"
+DRIVER_PATH = ".\chromedriver.exe"
+
 
 class StockNotifier:
 
     def __init__(self):
         self.running = True
         self.callbacks = []
-        self.stores = [Mwave()]
+        self.stores = [Mwave(), Scorptec(), Umart()]
         with open("urls.json") as json_file:
             self.urls = json.load(json_file)
 
@@ -26,18 +31,21 @@ class StockNotifier:
             "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36")
 
         # Create a Chrome webdriver
-        self.driver = webdriver.Chrome(options=options, service_log_path=os.devnull, executable_path=DRIVER_PATH)
-        
+        self.driver = webdriver.Chrome(
+            options=options, service_log_path=os.devnull, executable_path=DRIVER_PATH)
+
     async def start(self):
         print("StockNotifier: Started")
         while self.running:
             for store in self.stores:
-                changed, in_stock, out_stock = store.scrape(self.driver, self.urls["mwave"])
+                changed, in_stock, out_stock = store.scrape(
+                    self.driver, self.urls[store.store_name()])
                 if changed:
                     for callback in self.callbacks:
                         await callback(in_stock, out_stock)
-                print("StockNotifier: Sleeping")
-                await asyncio.sleep(SCRAPE_INTERVAL)
+                print("StockNotifier:", in_stock)
+            print("StockNotifier: Sleeping")
+            await asyncio.sleep(SCRAPE_INTERVAL)
 
     def stop(self):
         self.running = False
@@ -49,7 +57,11 @@ class StockNotifier:
         for store in self.stores:
             store.save()
 
+
 if __name__ == "__main__":
-    stock_notifier = StockNotifier()
-    stock_notifier.start()
-    stock_notifier.registerCallback(print)
+    try:
+        stock_notifier = StockNotifier()
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(stock_notifier.start())
+    except KeyboardInterrupt:
+        print("Exiting")

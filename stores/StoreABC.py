@@ -4,7 +4,7 @@ import os.path
 import json
 
 Product = namedtuple("Product", ["name", "price", "image", "store", "link"])
-
+DIRECTORY = "data/"
 
 class Store(ABC):
 
@@ -15,14 +15,14 @@ class Store(ABC):
 
     @property
     def filename(self):
-        return f"{self.store_name()}.json"
-        ...
+        return f"{DIRECTORY}{self.store_name()}.json"
 
     @abstractmethod
     def scrape(self, driver, url):
         ...
 
     def load(self):
+        os.makedirs(DIRECTORY, exist_ok=True)
         if not os.path.isfile(self.filename):
             return set()
         with open(self.filename, "r") as json_file:
