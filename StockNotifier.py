@@ -3,14 +3,12 @@ from selenium.webdriver.chrome.options import Options
 from stores.Mwave import Mwave
 from stores.Scorptec import Scorptec
 from stores.Umart import Umart
-import os
+import os, sys
 import json
 import asyncio
 
 # Time between scrapes (seconds)
 SCRAPE_INTERVAL = 30
-DRIVER_PATH = ".\chromedriver.exe"
-
 
 class StockNotifier:
 
@@ -31,8 +29,9 @@ class StockNotifier:
             "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36")
 
         # Create a Chrome webdriver
+        driver_path = "chromedriver/chromedriver.exe" if sys.platform == "Windows" else "chromedriver/chromedriver"
         self.driver = webdriver.Chrome(
-            options=options, service_log_path=os.devnull, executable_path=DRIVER_PATH)
+            options=options, service_log_path=os.devnull, executable_path=driver_path)
 
     async def start(self):
         print("StockNotifier: Started")
