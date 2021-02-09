@@ -38,16 +38,23 @@ class Mwave(Store):
                 ).get_attribute("src")
                 stock_level = product_container.find_element_by_css_selector(
                     "div.basicInfos > ul > li:nth-child(1) > dl > dd").text
+                if "3080" in name:
+                    model = "RTX 3080"
+                elif "3070" in name:
+                    model = "RTX 3070"
+                else:
+                    model = "N/A"
                 # Handle in stock or out of stock
                 if stock_level != "Currently No Stock" and name not in self.in_stock_items:
                     changed = True
                     self.in_stock_items.add(name)
-                    new_in_stock.append(Product(name, price, image, self.store_name(), url))
+                    new_in_stock.append(
+                        Product(name, model, price, image, self.store_name(), url))
                 elif stock_level == "Currently No Stock" and name in self.in_stock_items:
                     changed = True
                     self.in_stock_items.remove(name)
                     new_out_of_stock.append(
-                        Product(name, price, image, self.store_name(), url))
+                        Product(name, model, price, image, self.store_name(), url))
             else:
                 # URL is for a result search or product list
                 result_li = driver.find_element_by_css_selector(
@@ -66,12 +73,18 @@ class Mwave(Store):
                     ).get_attribute("src")
                     in_stock = item.find_element_by_css_selector(
                         "p > a > span > span").text != "Notify Me"
+                    if "3080" in name:
+                        model = "RTX 3080"
+                    elif "3070" in name:
+                        model = "RTX 3070"
+                    else:
+                        model = "N/A"
                     # Handle in stock or out of stock
                     if in_stock and name not in self.in_stock_items:
                         changed = True
                         self.in_stock_items.add(name)
                         new_in_stock.append(
-                            Product(name, price, image, self.store_name(), link))
+                            Product(name, model, price, image, self.store_name(), link))
                     elif not in_stock and name in self.in_stock_items:
                         changed = True
                         self.in_stock_items.remove(name)

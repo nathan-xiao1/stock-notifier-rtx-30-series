@@ -8,7 +8,7 @@ import json
 import asyncio
 
 # Time between scrapes (seconds)
-SCRAPE_INTERVAL = 30
+SCRAPE_INTERVAL = 60
 
 class StockNotifier:
 
@@ -43,6 +43,7 @@ class StockNotifier:
                     for callback in self.callbacks:
                         await callback(in_stock, out_stock)
                 print("StockNotifier:", in_stock)
+            self.save()
             print("StockNotifier: Sleeping")
             await asyncio.sleep(SCRAPE_INTERVAL)
 

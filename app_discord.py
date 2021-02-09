@@ -38,7 +38,7 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-    elif message.author.id in ADMIN and message.content.startswith("!!"):
+    if message.author.id in ADMIN and message.content.startswith("!!"):
         print(f"{message.author}: {message.content}")
         if message.content == "!!clear" and message.channel in channels:
             await message.channel.send('Confirm clear message? (y/n)')
@@ -47,6 +47,7 @@ async def on_message(message):
                 return
             await message.channel.delete_messages(await message.channel.history().flatten())
         elif message.content == "!!embed":
+            await message.channel.send(f"> RTX 3070")
             await message.channel.send(embed=createEmbedded(
                 Product(
                     name='MSI GeForce RTX 3070 VENTUS 2X OC 8GB Video Card',
@@ -54,7 +55,7 @@ async def on_message(message):
                     image='https://cdn.mwave.com.au/images/midimage/msi_geforce_rtx_3070_ventus_2x_oc_8gb_video_card_ac38099_1.jpg',
                     store='Mwave',
                     link='https://www.mwave.com.au/product/msi-geforce-rtx-3070-ventus-2x-oc-8gb-video-card-ac38099')
-                )
+            )
             )
 
 
@@ -62,6 +63,7 @@ async def notify(in_stock, out_stock):
     print("Notified")
     for item in in_stock:
         for channel in channels:
+            await channel.send(f"> {item.model}")
             await channel.send(embed=createEmbedded(item))
     for item in out_stock:
         for channel in channels:
@@ -77,7 +79,7 @@ def createEmbedded(item, in_stock=True):
     embed.set_thumbnail(url=item.image)
     embed.add_field(name="Price", value=item.price, inline=True)
     embed.add_field(name="Product Link",
-                    value=f"[Take me there]({item.link})", inline=True)
+                    value=f"[Click Here]({item.link})", inline=True)
     embed.set_footer(
         text=f"Updated at {datetime.now(TIME_ZONE).strftime(TIME_FORMAT)}")
     return embed
@@ -92,5 +94,4 @@ try:
 except KeyboardInterrupt:
     loop.run_until_complete(client.logout())
 finally:
-    stock_notifier.save()
     loop.close()

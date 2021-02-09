@@ -37,17 +37,23 @@ class Umart(Store):
                     "div div.goods_img > a > img").get_attribute("src")
                 in_stock = product_detail.find_element_by_css_selector(
                     "div  span.goods_stock > font > b").text != "Out Of Stock"
+                if "3080" in name:
+                    model = "RTX 3080"
+                elif "3070" in name:
+                    model = "RTX 3070"
+                else:
+                    model = "N/A"
                 # Handle in stock or out of stock
                 if in_stock and name not in self.in_stock_items:
                     changed = True
                     self.in_stock_items.add(name)
                     new_in_stock.append(
-                        Product(name, price, image, self.store_name(), link))
+                        Product(name, model, price, image, self.store_name(), link))
                 elif not in_stock and name in self.in_stock_items:
                     changed = True
                     self.in_stock_items.remove(name)
                     new_out_of_stock.append(
-                        Product(name, price, image, self.store_name(), link))
+                        Product(name, model, price, image, self.store_name(), link))
             # Delay to avoid overloading server
             time.sleep(SCRAPE_DELAY)
         return changed, new_in_stock, new_out_of_stock

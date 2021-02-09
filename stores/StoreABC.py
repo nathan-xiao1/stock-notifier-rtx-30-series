@@ -3,7 +3,7 @@ from collections import namedtuple
 import os.path
 import json
 
-Product = namedtuple("Product", ["name", "price", "image", "store", "link"])
+Product = namedtuple("Product", ["name", "model", "price", "image", "store", "link"])
 DIRECTORY = "data/"
 
 class Store(ABC):
