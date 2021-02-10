@@ -89,7 +89,7 @@ class Mwave(Store):
                         changed = True
                         self.in_stock_items.remove(name)
                         new_out_of_stock.append(
-                            Product(name, price, image, self.store_name(), link))
+                            Product(name, model, price, image, self.store_name(), link))
             # Delay to avoid overloading server
             time.sleep(SCRAPE_DELAY)
         return changed, new_in_stock, new_out_of_stock

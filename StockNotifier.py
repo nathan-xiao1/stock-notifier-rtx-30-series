@@ -3,19 +3,20 @@ from selenium.webdriver.chrome.options import Options
 from stores.Mwave import Mwave
 from stores.Scorptec import Scorptec
 from stores.Umart import Umart
+from stores.PCCG import PCCG
 import os, sys
 import json
 import asyncio
 
 # Time between scrapes (seconds)
-SCRAPE_INTERVAL = 60
+SCRAPE_INTERVAL = 90
 
 class StockNotifier:
 
     def __init__(self):
         self.running = True
         self.callbacks = []
-        self.stores = [Mwave(), Scorptec(), Umart()]
+        self.stores = [Mwave(), Scorptec(), Umart(), PCCG()]
         with open("urls.json") as json_file:
             self.urls = json.load(json_file)
 

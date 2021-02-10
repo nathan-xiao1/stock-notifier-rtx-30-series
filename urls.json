@@ -10,5 +10,13 @@
     "Umart": [
         "https://www.umart.com.au/GeForce-RTX-3070_C.html?category=1065&page=1&pagesize=3",
         "https://www.umart.com.au/GeForce-RTX-3080_C.html?category=1063&page=1&pagesize=3"
+    ],
+    "PC Case Gear": [
+        "https://www.pccasegear.com/category/193_2137/graphics-cards/geforce-rtx-3070",
+        "https://www.pccasegear.com/category/193_2126/graphics-cards/geforce-rtx-3080"
+    ],
+    "Dcomp": [
+        "https://dcomp.com.au/productdetail/3206",
+        "https://dcomp.com.au/productdetail/3205"
     ]
 }
